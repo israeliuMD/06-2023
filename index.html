@@ -1,0 +1,2515 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>בחינת מחלות עיניים</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      display: flex;
+    }
+    
+    .sidebar {
+      width: 250px;
+      height: 100vh;
+      background-color: #fff;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+      overflow-y: auto;
+      position: fixed;
+      right: 0;
+      top: 0;
+      z-index: 100;
+      padding: 15px 10px;
+    }
+    
+    .sidebar-title {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .question-nav {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+	  padding-bottom: 25px;
+    }
+    
+    .nav-item {
+      text-align: center;
+      padding: 8px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 15px;
+      background-color: white;
+    }
+    
+    .nav-item:hover {
+      background-color: #f0f0f0;
+    }
+    
+    .nav-item.active {
+      background-color: #4a90e2;
+      color: white;
+      border-color: #4a90e2;
+    }
+    
+    .nav-item.answered {
+      background-color: #e3f2fd;
+      border-color: #4a90e2;
+    }
+    
+    .main-content {
+      margin-right: 350px;
+      padding: 50px;
+      max-width: 800px;
+      margin-left: auto;
+    }
+    .question-container {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .question-number {
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+    .image-container {
+      text-align: center;
+      margin: 15px 0;
+    }
+    .image-container img {
+      max-width: 100%;
+      max-height: auto;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .option {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+    }
+    .option:hover {
+      background-color: #f9f9f9;
+    }
+    .option.selected {
+      border-color: #4a90e2;
+      background-color: #e3f2fd;
+    }
+    .option.correct {
+      border-color: #4caf50;
+      background-color: #e8f5e9;
+    }
+    .option.incorrect {
+      border-color: #f44336;
+      background-color: #ffebee;
+    }
+    .option-label {
+      font-weight: bold;
+      margin-left: 10px;
+      min-width: 20px;
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 0 5px;
+    }
+    button:hover {
+      background-color: #3f7fd1;
+    }
+    button:disabled {
+      background-color: #ddd;
+      cursor: not-allowed;
+    }
+    .score-container {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .score-title {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .mode-toggle {
+      margin-bottom: 20px;
+    }
+    .multiple-images-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin: 15px 0;
+    }
+    .image-label {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .finish-btn {
+      background-color: #4caf50;
+      font-weight: bold;
+      font-size: 1.1em;
+      padding: 10px 20px;
+    }
+    .finish-btn:hover {
+      background-color: #3d8b40;
+    }
+    .results-container {
+      display: none;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .results-title {
+      font-size: 1.5em;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+    .result-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+    .result-item.correct {
+      background-color: #e8f5e9;
+      border-color: #4caf50;
+    }
+    .result-item.incorrect {
+      background-color: #ffebee;
+      border-color: #f44336;
+    }
+    .result-item.unanswered {
+      background-color: #f5f5f5;
+    }
+    .result-number {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .result-answer {
+      font-size: 1.2em;
+    }
+    .return-to-exam {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+    }
+    .results-summary {
+      margin: 20px 0;
+      padding: 15px;
+      background-color: #f0f8ff;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 1.2em;
+    }
+    @media print {
+      .no-print {
+        display: none;
+      }
+	    /* Mobile responsiveness */
+@media screen and (max-width: 768px) {
+  body {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    padding: 10px 5px;
+    margin-bottom: 10px;
+  }
+  
+  .question-nav {
+    grid-template-columns: repeat(10, 1fr);
+    gap: 5px;
+  }
+  
+  .nav-item {
+    padding: 5px 0;
+    font-size: 12px;
+  }
+  
+  .main-content {
+    margin-right: 0;
+    padding: 15px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .question-container {
+    padding: 15px;
+  }
+  
+  .image-container img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .multiple-images-container {
+    flex-direction: column;
+  }
+  
+  .option {
+    padding: 8px;
+  }
+  
+  .option-label {
+    min-width: 15px;
+  }
+  
+  .controls {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .results-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* Small phones */
+@media screen and (max-width: 480px) {
+  .question-nav {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  
+  h1 {
+    font-size: 1.2em;
+  }
+  
+  .results-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Fix for iPhone and other mobile devices */
+@media screen and (max-width: 390px) {
+  .main-content {
+    padding: 10px;
+  }
+  
+  .question-container {
+    padding: 10px;
+  }
+  
+  button {
+    padding: 6px 12px;
+    font-size: 0.9em;
+  }
+}
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar no-print" id="sidebar">
+    <div class="sidebar-title">ניווט שאלות</div>
+    <div class="question-nav" id="question-nav">
+      <!-- Navigation buttons will be generated here -->
+    </div>
+  </div>
+  
+  <div class="main-content">
+    <h1>בחינת מחלות עיניים - שלב א' מועד 06.2023 גרסה 2</h1>
+    
+    <div class="mode-toggle no-print">
+      <button id="exam-mode-btn" onclick="setMode('exam')" disabled>מצב בחינה</button>
+      <button id="study-mode-btn" onclick="setMode('study')">מצב למידה</button>
+      <button id="toggle-answers-btn" onclick="toggleAnswers()" style="display: none;">הצג תשובות</button>
+    </div>
+    
+    <div id="score-display" style="display: none;" class="score-container">
+      <div class="score-title">ציון</div>
+      <div id="score-text"></div>
+    </div>
+    
+    <div id="question-container" class="question-container">
+      <!-- Questions will be inserted here -->
+    </div>
+    
+    <div id="results-container" class="results-container">
+      <div class="results-title">סיכום תוצאות הבחינה (נא לשים לב, ישנן שאלות בהן התקבלו תשובות נוספות...)</div>
+      <div class="results-summary" id="results-summary"></div>
+      <div class="results-grid" id="results-grid"></div>
+      <button class="return-to-exam no-print" id="return-btn" onclick="returnToExam()">חזרה לבחינה</button>
+      <button class="return-to-exam no-print" id="print-btn" onclick="window.print()">הדפס תוצאות</button>
+    </div>
+    
+    <div id="controls" class="controls no-print">
+      <button id="prev-btn" onclick="prevQuestion()" disabled>הקודם</button>
+      <div>
+        <span id="question-counter"></span>
+        <button id="finish-btn" onclick="showResults()" class="finish-btn" style="display: none;">סיים בחינה</button>
+      </div>
+      <button id="next-btn" onclick="nextQuestion()">הבא</button>
+    </div>
+  </div>
+   
+<script>
+  // Define the questions
+    const questions = [
+  {
+    id: 1,
+    text: "מי מהבאים הוא המועמד הטוב ביותר ל-SURFACE ABLATION?",
+    options: {
+      'א': "מטופל בן 30 עם מרשם היפראופי של +4 ומחלת SJOGRENS.",
+      'ב': "מטופל בן 40 עם אסטיגמציה ATR גבוהה בשל PELLUCID MARGINAL DEGENERATION.",
+      'ג': "מטופל בן 40 עם מרשם של מיופי של 4- ומראה אופייני ל-FORME FRUSTE.",
+      'ד': "מטופל בן 50 עם מרשם מיופי של 4- ו-EBMD."
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 2,
+    text: "כיצד מוגדר המצב שבו העפעפיים לוחצים על הקרנית וגורמים לקרנית להיות קמורה יותר במרידיאן (meridian) אנכי ושטוחה יותר במרידיאן האופקי?",
+    options: {
+      'א': "אסטיגמטיזם \"עם הכלל\" (with the rule).",
+      'ב': "אסטיגמטיזם \"נגד הכלל\" (against the rule).",
+      'ג': "אסטיגמטיזם עם תיקון על ידי מינוס צילינדר בציר 90 מעלות.",
+      'ד': "אסטיגמטיזם אירגולרי."
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 3,
+    text: "מה הטיפול המומלץ למצב זה?",
+    options: {
+      'א': "אנטי VEGF",
+      'ב': "tPA",
+      'ג': "PDT",
+      'ד': "מעקב"
+    },
+    image: "3-1.png",
+    correctAnswer: "ד"
+  },
+  {
+    id: 4,
+    text: "איזו מבין התרופות הבאות להרדמה אזורית (regional anesthetics) הינה בעלת זמן ההשפעה (duration of action) הארוך ביותר?",
+    options: {
+      'א': "Mepivacaine",
+      'ב': "Procaine",
+      'ג': "Bupivacaine",
+      'ד': "Lidocaine"
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 5,
+    text: "מה הכוונה בביטוי corneal warpage?",
+    options: {
+      'א': "שינויים במבנה הקרנית כתוצאה מלחץ על ידי כלזיון במרכז עפעף עליון.",
+      'ב': "שינויים במבנה הקרנית כתוצאה משנית לניתוח רפרקציה בלייזר.",
+      'ג': "שינויים במבנה הקרנית כתוצאה מהרכבת עדשות מגע.",
+      'ד': "שינויים במבנה הקרנית כתוצאה משפשוף כרוני, למשל ב-vernal conjunctivitis."
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 6,
+    text: "מה נכון לגבי הפגם ההתפתחותי בעדשה המתואר בתמונה הבאה?",
+    options: {
+      'א': "מקושר לסינדרומים כמו וויל מרצ'זאני (Weill-Marchesani) ומרפן (Marfan).",
+      'ב': "במידה ונוצר pupillary block טיפול הבחירה יהיה miotics.",
+      'ג': "אופייני שרואים את גבול העדשה במנורת סדק גם באישון שאינו מורחב כלל.",
+      'ד': "בדרך כלל צורת העדשה גורמת לרפרקציה היפראופית."
+    },
+    image: "6-1.png",
+    correctAnswer: "א"
+  },
+  {
+    id: 7,
+    text: "בן 45 סובל מאירועים חוזרים של כאבים דוקרים בעין באמצע הלילה ובבוקר ביקיצה. מתייצג עם התמונה הקלינית הבאה (A+B): הוחלט לבצע פרוצדורה טיפולית. מהי הפרוצדורה שרואים בתמונה הימנית?",
+    options: {
+      'א': "Anterior stromal puncture",
+      'ב': "Superficial keratectomy",
+      'ג': "Diamond dust burr",
+      'ד': "Epithelial debridement"
+    },
+    image: "7-1.png",
+    correctAnswer: "א"
+  },
+  {
+    id: 8,
+    text: "איזה מהמשפטים הבאים הוא הנכון ביותר בהתייחס לדיפרקציה (DIFFRACTION)?",
+    options: {
+      'א': "תופעת הדיפרקציה גורמת לכך שקיים גבול של רזולוציה שניתן להשיג באישון קטן מאוד.",
+      'ב': "לאור אדום יהיה Airy disc קטן יותר מאשר לאור כחול.",
+      'ג': "כל סוגי העדשות התוך-עיניות (IOL), עדשות המשקפיים ועדשות המגע המולטיפוקליות – מבוססות על תופעת הדיפרקציה.",
+      'ד': "לפי התיאוריה, ככל שקוטר האישון קטן יותר ה-Airy disc קטן יותר וחדות הראיה טובה יותר."
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 9,
+    text: "איזה מהמשפטים הבאים הוא הנכון ביותר בהתייחס לחומרים המשמשים לצביעה של הקרנית?",
+    options: {
+      'א': "פלורסצאין (fluorescein), רוז בנגל (rose bengal), וכן ליזמין גרין (lissamine green) צובעים אפיתל לא חיוני (devitalized epithelial cells).",
+      'ב': "רוז בגל בעל השפעה אנטי ויראלית וצובע אפיתל לא חיוני (devitalized epithelial cells).",
+      'ג': "ליזמין גרין צובע אפיתל חיוני, ופלורסצאין צובע פגמים באפיתל.",
+      'ד': "לפלורסצאין ישנה השפעה אנטי ויראלית."
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 10,
+    text: "אדם בגיל 50 מקבל טיפות פילוקרפין 1.25% (pilocarpine) לטיפול בפרסביופיה. מה מהבאים נכון בנוגע לטיפול זה?",
+    options: {
+      'א': "הטיפול אינו מאושר FDA.",
+      'ב': "יש לקחת את הטיפה כל שעתיים בשעות העירות.",
+      'ג': "מומלץ להימנע מנהיגה בלילה.",
+      'ד': "אחת מתופעות הלוואי של התרופה היא הלבנה (blanching) של הלחמית."
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 11,
+    text: "איך נקרא המבנה המסומן בחץ אדום?",
+    options: {
+      'א': "Septum",
+      'ב': "Müller muscle",
+      'ג': "Tarsus",
+      'ד': "Levator aponeurosis"
+    },
+    image: "11-1.png",
+    correctAnswer: "א"
+  },
+  {
+    id: 12,
+    text: "מהו הגן הפגוע באלביניזם?",
+    options: {
+      'א': "Lysyl hydroxylase",
+      'ב': "Albinase",
+      'ג': "Tyrosinase",
+      'ד': "Cystathionine β-synthase"
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 13,
+    text: "מה מהבאים בודק המכשיר המפיק את הפלט הגרפי הבא?",
+    options: {
+      'א': "CORNEAL CONDUCTIVITY",
+      'ב': "CORNEAL ABBEROMETRY",
+      'ג': "CONREAL ULTRA-BIOMICROSCOPY",
+      'ד': "CORNEAL HYSTERESIS"
+    },
+    image: "13-1.png",
+    correctAnswer: "ד"
+  },
+  {
+    id: 14,
+    text: "מה מדגימה הצביעה בתמונה?",
+    options: {
+      'א': "מלנומה של הלחמית.",
+      'ב': "לימפומה של הלחמית.",
+      'ג': "עמילואידוזיס של הלחמית.",
+      'ד': "קרצינומה של הלחמית."
+    },
+    image: "14-1.png",
+    correctAnswer: "ג"
+  },
+  {
+    id: 15,
+    text: "מה מהבאים אופייני לפרזנטציה של מחלת Familial Exudative Vitreoretinopathy (FEVR) בהשוואה ל-retinopathy of prematurity (ROP)?",
+    options: {
+      'א': "בניגוד ל-ROP שבה יש אקסודטים ברשתית, במחלת FEVR אין אקסודטים ברשתית.",
+      'ב': "בניגוד ל-ROP שמופיעה בפגים, מחלת FEVR מופיעה בתינוקות שנולדו בזמן ובמשקל לידה תקין.",
+      'ג': "בניגוד ל-ROP שהמהלך שלה הוא בלתי צפוי (unpredictable), למחלת FEVR יש מהלך קליני צפוי (predictable).",
+      'ד': "בניגוד ל-ROP שאינה גנטית, מחלת FEVR מועברת בדרך כלל בצורה אוטוזומלית רצסיבית."
+    },
+    correctAnswer: "ב"
+  },
+  {
+    id: 16,
+    text: "לאיזה נזק בשדה הראיה ניתן לצפות אצל מטופל עם see-saw nystagmus?",
+    options: {
+      'א': "bitemporal hemianopia",
+      'ב': "bilateral nasal step",
+      'ג': "homonymous hemianopia",
+      'ד': "unilateral constriction"
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 17,
+    text: "חולה בן 59 פונה בשל כאבים סביב עין ימין וכפילות ראיה. להלן תמונת ה-MRI: איזה מהממצאים הבאים יתכן?",
+    options: {
+      'א': "חולשת עצב שישי מימין ועצב שביעי משמאל.",
+      'ב': "הפרעה בעצב שביעי מימין ומידריאזיס מימין.",
+      'ג': "הפרעה בעצב שישי מימין ובעצב השביעי מימין.",
+      'ד': "חולשת עצב חמישי מימין ועצב שישי מימין."
+    },
+    image: "17-1.png",
+    correctAnswer: "ג"
+  },
+  {
+    id: 18,
+    text: "איזה מהמאפיינים הבאים הוא אחד ממאפייניה של אנאירידיה קלאסית, שהינה מחלה כלל עינית (Pan-Ophthalmic)?",
+    options: {
+      'א': "חסר בגן PAX6 שממוקם ב-13q14.",
+      'ב': "Ectopia Lentis",
+      'ג': "Cerebellar Ataxia",
+      'ד': "Microcornea"
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 19,
+    text: "בעת תפירת השריר לסקלרה בניתוח לתיקון פזילה, זולג נוזל צלול מתוך גלגל העין באזור יציאת המחט מהסקלרה. מה מהבאים הכי סביר שיקרה?",
+    options: {
+      'א': "תופיע אנדופתלמיטיס.",
+      'ב': "לאחר הניתוח יהיה תת-תיקון (under correction) של זווית הפזילה.",
+      'ג': "תתפתח היפרדות רשתית רגמטוגנית.",
+      'ד': "תיווצר צלקת כוריורטינלית קטנה ללא השפעה על הראיה."
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 20,
+    text: "מה מהבאים נכון לגבי הבלוטה ע״ש Moll?",
+    options: {
+      'א': "בלוטה מסוג Apocrine שמפרישה זיעה (sweat).",
+      'ב': "בלוטה מסוג Apocrine שמפרישה שומן (oil).",
+      'ג': "בלוטה מסוג Holocrine שמפרישה שומן (oil).",
+      'ד': "בלוטה מסוג Holocrine שמפרישה זיעה (sweat)."
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 21,
+    text: "מתי מתחילים העפעפיים להתנתק זה מזה במהלך ההתפתחות העוברית?",
+    options: {
+      'א': "כשבוע לאחר הלידה.",
+      'ב': "חודש 1-2.",
+      'ג': "חודש 5-7.",
+      'ד': "חודש 3-4."
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 22,
+    text: "מה נכון לגבי השפעת מחלת הסוכרת על העדשה?",
+    options: {
+      'א': "בילד עם שיפט היפראופי מהיר (acute hyperopic shift) יש לחשוד בנוכחות סוכרת לא מאובחנת.",
+      'ב': "ילדים עם סוכרת סובלים מירידה ב-amplitude of accommodation ולכן בסיכון לפרסביופיה (presbyopia) מוקדמת.",
+      'ג': "ילד עם סוכרת שאינה בשליטה יכול לסבול מ-sunflower cataract.",
+      'ד': "במחקרים שבדקו ילדים עם סוכרת נמצא ששכיחות הקטרקט קטנה מ-0.1%."
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 23,
+    text: "מה תפקידו של האנזים RPE65 במעגל הראיה?",
+    options: {
+      'א': "נושא 11cis-retinal אל הפוטורצפטור.",
+      'ב': "נושא All-trans-retinol לתוך תא ה-RPE.",
+      'ג': "הופך All-trans-Retinyl esther ל-11cis-Retinol בתוך תא ה-RPE.",
+      'ד': "נושא All-trans-Retinol מהדיסק אל הציטוזול בתא הפוטורצפטורי."
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 24,
+    text: "איזה מהשריר הישרים (rectus muscle) הוא היחיד אשר אין לו שריר אלכסוני אשר עובר בסמוך או משיק אליו? (tangential)",
+    options: {
+      'א': "Lateral",
+      'ב': "Inferior",
+      'ג': "Medial",
+      'ד': "Superior"
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 25,
+    text: "לפניכם ממצא קליני ותמונה היסטולוגית תואמת: מה האבחנה?",
+    options: {
+      'א': "הסתיידות בסקלרה.",
+      'ב': "נמס לאחר הקרנה.",
+      'ג': "נמס לאחר סקלריטיס.",
+      'ד': "זיהום טפילי."
+    },
+    image: "25-1.png",
+    correctAnswer: "ג"
+  },
+  {
+    id: 26,
+    text: "מה מהבאים נכון לגבי Primary Vitreoretinal Lymphoma?",
+    options: {
+      'א': "למדוכאי חיסון סיכון מוך לחלות במחלה.",
+      'ב': "מופיע לרוב בגיל המבוגר מאוד (סביב גיל 80-90).",
+      'ג': "בכ-98% מהמקרים מדובר בלימפומה של תאי T.",
+      'ד': "יותר משני שליש מהחולים יפתחו מחלה של מערכת העצבים המרכזית."
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 27,
+    text: "בת 20, אחרי תאונת דרכים, מתלוננת על אובדן ראיה משמאל. בבדיקתה חדות ראיה וראיית צבעים תקינות בכל עין, ללא RAPD. מקטעים קדמי ואחורי תקינים דו- צדדי. שדה הראיה בעין ימין תקין, משמאל חסר טמפורלי מכבד קו האמצע. איך ניתן להוכיח אובדן ראיה לא אורגני?",
+    options: {
+      'א': "ביצוע שדה ראיה האמפרי (Humphrey) בינוקולרי.",
+      'ב': "בדיקה חדות ראיה עם fogging.",
+      'ג': "בדיקת סטריאופסיס.",
+      'ד': "mirror test."
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 28,
+    text: "מה מהבאים נכון לגבי ריכוז החמצן בנוזל הלשכה הקדמית aqueous humor?",
+    options: {
+      'א': "ריכוז החמצן בנוזל הלשכה הקדמית מושפע בעיקר משטף החמצן האטמוספרי (atmospheric oxygen flux) דרך הקרנית.",
+      'ב': "ריכוז גבוה שלו יכול לגרום לנזק ל-Trabecular Meshwork וכתוצאה מכך לגלאוקומה.",
+      'ג': "אנדותל הקרנית אינו תלוי ברמת החמצן בלשכה הקדמית לשם תפקודו.",
+      'ד': "צפוי שיירד לאחר ניתוח ויטרקטומיה (PPV)."
+    },
+    correctAnswer: "ב"
+  },
+  {
+    id: 29,
+    text: "איזו מהטכניקות הבאות אינה SURFACE ABLATION?",
+    options: {
+      'א': "SMILE",
+      'ב': "LASEK",
+      'ג': "EPI-LASIK",
+      'ד': "TRANSEPITHELIAL ABLATION"
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 30,
+    text: "תינוק בן 6 חודשים מגיע עם התמונה הקלינית הבאה של הקרנית בשתי העיניים: מהי צורת התורשה הנפוצה ביותר של מחלה זו?",
+    options: {
+      'א': "הופעה ספורדית.",
+      'ב': "אוטוזומלית דומיננטית.",
+      'ג': "אוטוזומלית רצסיבית.",
+      'ד': "תאחיזה לכרומוזום X."
+    },
+    image: "30-1.png",
+    correctAnswer: "ג"
+  },
+  {
+    id: 31,
+    text: "מה מהבאים נכון לגבי הזלפת טיפות הרדמה טופיקלית על פני שטח העין?",
+    options: {
+      'א': "מאפשרת חדירה טובה יותר של טיפות מרחיבות אישונים לעין על ידי הפרעה ל-tight juctions בין תאי האפיתל של הקרנית.",
+      'ב': "מתן טיפות הרדמה טופיקלית למטופלים עם ארוזיה בקרנית לשימוש ביתי זמני מומלץ, מכיוון שכך ניתן להפחית את שיעור הפניות למיון במטופלים אלה.",
+      'ג': "מתן טופיקלי של לידוקאין עלול לגרום לנזק בלתי הפיך לרשתית בשימוש ממושך.",
+      'ד': "מחקרים הראו שהזלפת ג'ל לידוקאין 2% על פני שטח העין, לפני חיטוי עם פולידין, מעלה בצורה משמעותית את הסיכון לאנדופתלמיטיס לאחר הזרקה תוך זגוגיתית."
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 32,
+    text: "איזה מחלבוני העדשה הקריסטלינית הבאים אינו מסיס במים אך מסיס ב-urea?",
+    options: {
+      'א': "Beta- Crystallins",
+      'ב': "Gamma- Crystallins",
+      'ג': "Alpha-Crystallins",
+      'ד': "Cytoskeletal proteins"
+    },
+    correctAnswer: "ב"
+  },
+  {
+    id: 33,
+    text: "פג נולד בשבוע 26 להריון במשקל לידה 800 גרם. בבדיקתו 12 שבועות לאחר לידתו נמצאו בקוטב האחורי וב-ZONE 1 טמפורלי עליון הממצאים הבאים: מה מהבאים הוא טיפול אפשרי להמשך ניהול המקרה?",
+    options: {
+      'א': "טיפול לייזר לאזור האוסקולרי בתוך מקסימום שבוע מהבדיקה.",
+      'ב': "טיפול קריותרפיה לאזור הא-וסקולרי.",
+      'ג': "מעקב בעוד שבוע.",
+      'ד': "זריקת אנטי VEGF לחלל הזגוגית בתוך מקסימום 72 שעות מהבדיקה."
+    },
+    image: "33-1.png",
+    correctAnswer: "ד"
+  },
+  {
+    id: 34,
+    text: "מטופל מגיע לבדיקה יומיים לאחר ניתוח קטרקט עם לשכה רדודה ולחץ תוך עיני נמוך. מה יכולה להיות סיבה סבירה לכך?",
+    options: {
+      'א': "Incision leak",
+      'ב': "Suprachoroidal hemorrhage",
+      'ג': "Capsular block syndrome",
+      'ד': "Malignant glaucoma"
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 35,
+    text: "הרפרקציה של נבדק היא +2.50 D. מה מהבאים נכון לגבי מצב זה?",
+    options: {
+      'א': "הכוח האופטי של העין הנבדקת הוא 62.50D.",
+      'ב': "הכוח האופטי של העין קטן במידה של 2.50D לעומת המצב שבו קרני האור הבאות ממרחק יתמקדו על הרשתית.",
+      'ג': "בלי תיקון במשקפיים, קרני האור, ממרחק רב, מתמקדות 2.50 מ\"מ מאחורי הרשתית.",
+      'ד': "הכוח האופטי של העין הנבדקת הוא 57.50D."
+    },
+    correctAnswer: "ב"
+  },
+  {
+    id: 36,
+    text: "להלן חתך היסטולוגי של קטע מהרשתית המקולרית: איפה נמצאים הגרעינים הבי-פולריים?",
+    options: {
+      'א': "4",
+      'ב': "1",
+      'ג': "2",
+      'ד': "3"
+    },
+    image: "36-1.png",
+    correctAnswer: "ג"
+  },
+  {
+    id: 37,
+    text: "במשפחה עם מחלה עינית העוברת בתורשה אוטוזומלית דומיננטית בגן מסוים, עם חדירות (penetrance) של 100%, מה צפוי להיות אחוז הילדים שיבטאו סימנים של המחלה?",
+    options: {
+      'א': "50%",
+      'ב': "100%",
+      'ג': "25%",
+      'ד': "0%"
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 38,
+    text: "בעת ביצוע רטינוסקופיה לאדם אחרי השתלת קרנית, ה-retinoscopy streak הולך ונהיה צר לכיוון השעה 12. מה המסקנה הנכונה בנוגע לתפרי הקרנית?",
+    options: {
+      'א': "התפרים בשעות 3 ו-9 הם tight.",
+      'ב': "התפר בשעה 12 הוא tight.",
+      'ג': "התפרים בשעות 3 ו-9 הם loose.",
+      'ד': "התפר בשעה 12 הוא loose."
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 39,
+    text: "מה מהבאים נכון בהקשר לסקלריטיס קדמית דיפוזית (Diffuse Anterior Scleritis)?",
+    options: {
+      'א': "היא הצורה הנדירה והמסוכנת ביותר של סקלריטיס.",
+      'ב': "טיפול טופיקלי יעיל מאוד, לכן בדרך כלל ניתן להימנע מטיפול סיסטמי.",
+      'ג': "בדרך כלל אין קשר למחלה סיסטמית ולכן בירור למחלה סיסטמית אינו רלוונטי.",
+      'ד': "חזרות של המחלה (recurrences) מאוד נפוצות."
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 40,
+    text: "מה ניתן לצפות למצוא במטופל/ת עם התמונה הבאה?",
+    options: {
+      'א': "Ipsilateral choroidal cavernous hemangioma",
+      'ב': "contralateral leptomeningeal angioma",
+      'ג': "תורשה אוטוזומלית רצסיבית.",
+      'ד': "נפוץ יותר בנקבות מאשר בזכרים."
+    },
+    image: "40-1.png",
+    correctAnswer: "ב"
+  },
+  {
+    id: 41,
+    text: "לאיזו תמונה קלינית מתאים הממצא המודגם בתמונה ומסומן בחיצים צהובים?",
+    options: {
+      'א': "סרקואידוזיס.",
+      'ב': "כוויה כימית.",
+      'ג': "פינגווקולה (pinguecula).",
+      'ד': "אלרגיה."
+    },
+    image: "41-1.png",
+    correctAnswer: "ד"
+  },
+  {
+    id: 42,
+    text: "באיזה מחולי הרטינובלסטומה הבאים, שעברו אוקלאציה, הפרוגנוזה הסיסטמית הכי טובה?",
+    options: {
+      'א': "רטינובלסטומה שמערבת את העצב הרטרו-למינרי.",
+      'ב': "חדירה מאסיבית של הרטינובלסטומה לכורואיד.",
+      'ג': "רטינובלסטומה עם מעורבות אקסטרא-סקלרלית.",
+      'ד': "רטינובלסטומה שמערבת את הויטראוס."
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 43,
+    text: "גבר בן 25 עם היסטוריה של כיבים כואבים חוזרים בפה ובגניטליה, אירועים של אירתמה נודוזום ואקנה בגב, פונה למיון עיניים בשל טשטוש ראיה ורגישות לאור בעין שמאל. מה מהבאים נכון לגבי הממצא העיני?",
+    options: {
+      'א': "לעיתים העין ללא אודם או כאב גם בנוכחות הממצא.",
+      'ב': "אם המטופל מטה את הראש הצידה, אופייני שהממצא יישאר במקומו ללא שינוי.",
+      'ג': "אם המטופל משקשק את ראשו, אופייני שהממצא יישאר במקומו ללא שינוי.",
+      'ד': "ללא טיפול, הממצא בדך כלל אינו חולף במשך מספר חודשים."
+    },
+	image: "43-1.png"
+    correctAnswer: "א"
+  },
+  {
+    id: 44,
+    text: "מה מהבאים נכון בנוגע לתמונת ה-ERG ב-Congenital stationary night blindness (CSNB)?",
+    options: {
+      'א': "ב-CSNB בדרך כלל גם ה-a-wave וגם ה-b-wave נורמלים.",
+      'ב': "ב-melanoma-associated retinopathy מופיעה תמונת ERG זהה לזו שב-CSNB.",
+      'ג': "ב-CSNB בדרך כלל גם ה-a-wave וגם ה-b-wave אינם נורמלים.",
+      'ד': "ב-CSNB אופייני שתופיע תמונת \"positive ERG\"."
+    },
+    correctAnswer: "ב"
+  },
+  {
+    id: 45,
+    text: "בן חצי שנה הופנה בשל חשד לפזילה, בה הבחינו הוריו מסמוך ללידה. לדברי ההורים נראית פזילה של אחת העיניים פנימה, לסירוגין, בחלקים רחבים מהיום. בבדיקתו לא עולה ממצא חריג אך להורים תמונה המדגימה את המצב אותו הם רואים: מה נכון לומר על סמך תמונה זו?",
+    options: {
+      'א': "אין עדיין אף מחקר בספרות שהראה שכיחות יתר של אמבליופיה רפרקטיבית במצב זה.",
+      'ב': "אין עדיין אף מחקר בספרות שהראה שכיחות יתר של פזילה אמיתית במצב זה.",
+      'ג': "אחת הסיבות למצב זה היא זווית קאפא חיובית (positive angle kappa).",
+      'ד': "אחת הסיבות האפשריות למצב זה הוא מרחק קטן בין האישונים (narrow interpupillary distance)."
+    },
+    image: "45-1.png",
+    correctAnswer: "ג"
+  },
+  {
+    id: 46,
+    text: "המטופל שבתמונה אובחן מלידה עם מיקרופתלמיה בעין שמאל: מה מהבאים נכון לגבי מיקרופתלמיה?",
+    options: {
+      'א': "גודל הארובה הוא בטווח הנורמה לגיל.",
+      'ב': "טיפול קוסמטי אפשרי הוא שתל ארובה.",
+      'ג': "פוטנציאל הראיה בד\"כ טוב.",
+      'ד': "הטיפול המקובל הוא אוקלאציה ולאחר מכן שתל ארובה."
+    },
+    image: "46-1.png",
+    correctAnswer: "א"
+  },
+  {
+    id: 47,
+    text: "מה מהבאים נכון בנוגע לביומטריה לפני ניתוח קטרקט?",
+    options: {
+      'א': "בנוסחאות המודרניות סטיה של יותר מ-1 דיופטר מהתוצאה הרפרקטיבית שהתקבלה היא שכיחה.",
+      'ב': "הנוסחא SRK/T מבוססת על מאגר נתונים המתעדכן בקביעות.",
+      'ג': "הנוסחא המועדפת לעיניים ארוכות היא Hoffer Q.",
+      'ד': "בנוסחאות דור רביעי משתמשים ברפרקציה מלפני הניתוח."
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 48,
+    text: "מהי תופעות לוואי אפשריות של Timolol maleate?",
+    options: {
+      'א': "Increased libido",
+      'ב': "Tachycardia",
+      'ג': "Corneal anesthesia",
+      'ד': "decreased endothelial cell count"
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 49,
+    text: "נבדק מרכיב משקפיים -2.50-1.50X175. הותאמה עדשת מגע רכה טורית באותו מרשם, אך הסימן על העדשה, שצריך להיות בשעה 6, נראה בשעה 7. מהי עדשת המגע המתאימה במצב זה?",
+    options: {
+      'א': "-2.50-1.50X145",
+      'ב': "-2.50-1.00X45",
+      'ג': "-2.50-1.00X175",
+      'ד': "-2.50-1.50X25"
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 50,
+    text: "מה מהבאים נכון לגבי האנטומיה של ה-medial canthal tendon (MCT) וה-lateral canthal tendon (LCT)?",
+    options: {
+      'א': "הזרוע העליונה של ה-LCT מתחברת לאפונוירוזה של הלבטור.",
+      'ב': "ה-LCT מתחבר ל-lateral orbital tubercle.",
+      'ג': "החיבור של ה-MCT ל-anterior lacrimal crest עדין יותר מהחיבור שלו ל-posterior lacrimal crest.",
+      'ד': "ה-LCT מתפצל לשתי זרועות (limbs), בעוד של-MCT יש זרוע אחת."
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 51,
+    text: "מטופל עם קטרקט אינו מעוניין כלל בניתוח אבל קרא באינטרנט על טיפול תרופתי ב-aldose reductase inhibitors למצבו. בהקשר זה, מה מהבאים נכון?",
+    options: {
+      'א': "טיפול זה הראה יעילות מסוימת במניעת קטרקט בבני אדם, אך רק בשילוב עם אנטיאוקסידנטים כמו אבץ, ביתא קרוטן, ויטמין C ו-ויטמין E.",
+      'ב': "טיפול זה הראה יעילות מסוימת במניעת קטרקט בבני אדם, אך רק במתן תוך ורידי ממושך.",
+      'ג': "טיפול זה הראה יעילות מסוימת במניעת קטרקט בחיות, אך לא בבני אדם.",
+      'ד': "טיפול זה לא הראה יעילות כלל במניעת קטרקט, לא בחיות ולא בבני אדם."
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 52,
+    text: "מה ניתן לצפות למצוא במטופל שמציג את הממצאים הבאים?",
+    options: {
+      'א': "יותר מ-90% מהמטופלים יפתחו גלאוקומה.",
+      'ב': "תורשה אוטוזומלית דומיננטית.",
+      'ג': "Posteriorly displaced Schwalbe line",
+      'ד': "מחלה חד צדדית."
+    },
+    image: "52-1.png",
+    correctAnswer: "ב"
+  },
+  {
+    id: 53,
+    text: "בן 40 מתלונן על ירידה בחדות הראיה מזה כחצי שנה. להלן צילום ה-OCT שלו שלא השתנה ב-3 החודשים האחרונים: מה הטיפול המומלץ?",
+    options: {
+      'א': "PDT",
+      'ב': "Anti VEGF",
+      'ג': "מעקב.",
+      'ד': "Mineralocorticoid receptor antagonists"
+    },
+    image: "53-1.png",
+    correctAnswer: "א"
+  },
+  {
+    id: 54,
+    text: "מה האבחנה הפתולוגית של הנגע בתמונה?",
+    options: {
+      'א': "PAM with moderate to severe atypia; C-MIN 3-5",
+      'ב': "Complexion associated melanosis; benign epithelial melanosis.",
+      'ג': "PAM without atypia or with mild atypia; C-MIN 1-2",
+      'ד': "Melanoma in situ; C-MIN >5"
+    },
+    image: "54-1.png",
+    correctAnswer: "ג"
+  },
+  {
+    id: 55,
+    text: "איזה ממצא חייב להופיע ב-monofixation syndrome?",
+    options: {
+      'א': "Eccentric fixation",
+      'ב': "Peripheral fusion",
+      'ג': "Esotropia קטנה מ-8PD",
+      'ד': "Macular scotoma בתנאים מונוקולרים."
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 56,
+    text: "איזה מהממצאים הבאים אינו מופיע בקורלציה למחלה ממנה סובל מטופל זה?",
+    options: {
+      'א': "Recurrent chalazia",
+      'ב': "Marginal keratitis",
+      'ג': "Stromal keratitis",
+      'ד': "Ectropion"
+    },
+    image: "56-1.png",
+    correctAnswer: "ד"
+  },
+  {
+    id: 57,
+    text: "איזה מכשיר אופטי מבוסס על העיקרון של Scheiner (חריר כפול, double pinhole)?",
+    options: {
+      'א': "Autorefractometer",
+      'ב': "Keratometer",
+      'ג': "Corneal topographer",
+      'ד': "slit lamp"
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 58,
+    text: "איזו מהמחלות הבאות הכי קשורה לפתולוגיה המוצגת בתמונה?",
+    options: {
+      'א': "מחלקת קרוהן-crohn disease",
+      'ב': "אנמיה חרמשית-sickle cell anemia",
+      'ג': "קוליטיס מכייבת-ulcerative colitis",
+      'ד': "אלביניזם עיני-עורי.Occulocutanous albinism"
+    },
+    image: "58-1.png",
+    correctAnswer: "ב"
+  },
+  {
+    id: 59,
+    text: "מהו הסיבוך הנפוץ ביותר אחרי ניתוח מתלה על שם Gundersen?",
+    options: {
+      'א': "ציסטות אפיתליאליות.",
+      'ב': "רטרקציה של הלחמית ששימשה ליצירת המתלה.",
+      'ג': "דימום מתחת למתלה.",
+      'ד': "פטוזיס."
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 60,
+    text: "איזו תופעת לוואי שכיחה יותר בהשתלה של מסתם a בהשוואה למסתם b?",
+    options: {
+      'א': "חשיפה של הצינורית.",
+      'ב': "היפוטוניה.",
+      'ג': "שלב היפרטנסיבי.",
+      'ד': "דיפלופיה."
+    },
+    image: "60-1.png",
+    correctAnswer: "ג"
+  },
+  {
+    id: 61,
+    text: "איזה מסוגי הלייזר הבאים חודר טוב יותר מלייזרים אחרים דרך קטרקט מסוג nuclear sclerosis ודרך moderate vitreous hemorrhage?",
+    options: {
+      'א': "לייזר באורך גל 570nm.",
+      'ב': "לייזר באורך גל 514nm.",
+      'ג': "לייזר באורך גל 488nm.",
+      'ד': "לייזר באורך גל 647nm."
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 62,
+    text: "איזו מהתרופות הבאות לא עלולה לגרום לאובאיטיס?",
+    options: {
+      'א': "ביספוספונטים Bisphosphonates",
+      'ב': "מתוטרקסט Methotrexate",
+      'ג': "מוקסיפלוקסצין Moxifloxacin",
+      'ד': "אדלימומב Adalimumab"
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 63,
+    text: "בת 18 מתלוננת על כאבי ראש והפרעות ראייה חולפות. ברקע בריאה, מטופלת בתרופות לאקנה. חדות הראייה וראיית הצבעים תקינים. לאיזה ממצא בשדות הראיה ניתן לצפות?",
+    options: {
+      'א': "ביטמפורל המיאנופיה.",
+      'ב': "הומונימוס המיאנופיה.",
+      'ג': "נזק אלטיטודינלי.",
+      'ד': "הגדלת הכתם העיוור דו צדדי."
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 64,
+    text: "מה מהמצבים הקליניים הבאים מתארת תופעת Heimann-Bielschowsky?",
+    options: {
+      'א': "ניסטגמוס שמופיע לאחר בהייה ממושכת על אובייקט קרוב.",
+      'ב': "ניסטגמוס שמופיע עם חולשה של עצב 4.",
+      'ג': "ניסטגמוס מונוקולרי בעין עם ראיה ירודה.",
+      'ד': "ניסטגמוס שמופיע רק בסגירת עין אחת."
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 65,
+    text: "בת 67 פונה עם תלונות של כאב ראש ועין ימין אדומה מזה כחודש ימים. בבדיקתה לחץ 29 ממ\"כ בעין ימין ו-19 ממ\"כ משמאל. להלן תמונת גוניוסקופיה של עין ימין: מה האבחנה המתאימה ביותר?",
+    options: {
+      'א': "Orbital Varix",
+      'ב': "PXF",
+      'ג': "גלאוקומה אנווסקולרית.",
+      'ד': "גלאוקומה פיגמנטרית."
+    },
+    image: "65-1.png",
+    correctAnswer: "ד"
+  },
+  {
+    id: 66,
+    text: "מה מהבאים נכון לגבי האנטומיה של תעלת שלם (Schlemm Canal)?",
+    options: {
+      'א': "הקיר החיצוני של התעלה הינו אנדותל רב שכבתי שמכיל פורות (pores).",
+      'ב': "התעלה מצופה בתאי אנדותל שנמצאים על ממברנת בסיס המשכית (continuous basement membrane).",
+      'ג': "קוטר התעלה הוא סביב 200-300 מיקרון אך יש וריאביליות רבה.",
+      'ד': "התעלה מצופה בתאי אפיתל."
+    },
+    correctAnswer: "ב"
+  },
+  {
+    id: 67,
+    text: "איזו צביעה אימונוהיסטוכימית מודגמת בתמונה ולאבחון אילו לזיות היא משמשת?",
+    options: {
+      'א': "צביעת Cytokeratin 7 שמשמשת לאבחון לזיות אפיתליאליות.",
+      'ב': "צביעת Melan-A שמשמשת לאבחון לזיות מלנוציטיות.",
+      'ג': "צביעת Cytokeratin AE1/AE3 שמשמשת לאבחון לזיות אפיתליאליות.",
+      'ד': "צביעת SOX-10 שמשמשת לאבחון לזיות מלנוציטיות."
+    },
+    image: "67-1.png",
+    correctAnswer: "ב"
+  },
+  {
+    id: 68,
+    text: "במהלך פיתוח תרופה חדשה לטיפול בדלקת לחמית אביבית, החברה המפתחת את התרופה תכננה ניסוי קליני אקראי מבוקר (Randomized Controlled Clinical Trial). בניסוי השתתפו 50 נבדקים והוא נועד לבדוק את בטיחות ויעילות התרופה. באיזה שלב של אישור ה-FDA נמצא המחקר?",
+    options: {
+      'א': "שלב 2.",
+      'ב': "שלב 3.",
+      'ג': "שלב 1.",
+      'ד': "שלב 0."
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 69,
+    text: "מהו הממצא האופייני בגוניוסקופיה במטופל עם התמונה הבאה?",
+    options: {
+      'א': "סינכיות אחוריות.",
+      'ב': "הקשתית במנח bowing אחורי.",
+      'ג': "Sampaolesi line",
+      'ד': "פיגמנטציה מעטה בזווית."
+    },
+    image: "69-1.png",
+    correctAnswer: "ג"
+  },
+  {
+    id: 70,
+    text: "מטופל עם אירוע מוחי איסכמי, אובחן עם פגם בשדה הראיה כמתואר להלן: איזה מהמבנים בתמונה השמאלית נפגע?",
+    options: {
+      'א': "א",
+      'ב': "ד",
+      'ג': "ב",
+      'ד': "ג"
+    },
+    image: "70-1.png",
+    correctAnswer: "א"
+  },
+  {
+    id: 71,
+    text: "מה מהבאים נכון בנוגע לשימוש בתרופות סטרואידליות לטיפול באובאיטיס?",
+    options: {
+      'א': "טיפות לוטפרדול (Loteprednol) ופלואורומתלון (Fluorometholone) הן אפקטיביות לשליטה על אובאיטיס חמורה כמו פרדניזולון (Prednisolone).",
+      'ב': "הזרקה intravitreal של טריאמצינולון (Triamcinolone acetonide) עלולה לגרום לעלייה בלחץ התוך עיני אבל רק כ-1% מהמטופלים יזדקקו לטיפול טופיקלי להורדת הלחץ.",
+      'ג': "ניתן לעצור טיפול בסטרואידים סיסטמים באופן מיידי, מבלי לחשוש לפגיעה בציר ההיפותלמוס- אדרנל-היפופיזה בשל חסר בקורטיזול, אם הטיפול ניתן עד לתקופה של 2-3 שבועות.",
+      'ד': "בהזרקה פריאוקולרית של סטרואידים מתקבל ריכוז גבוה יותר של סטרואידים במקטע האחורי של העין מאשר בהזרקה של סטרואידים לזגוגית."
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 72,
+    text: "איזו מהתרופות הבאות אינה בעלת סיכון לפגיעה ברשתית במנגנון של occlusive retinopathy or microvasulopathy?",
+    options: {
+      'א': "Procainamide",
+      'ב': "Gentamycin",
+      'ג': "Tamoxifen",
+      'ד': "Vancomycin"
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 73,
+    text: "איזה מהמשפטים הבאים נכון בהתייחס לגידול המופיע בתמונה?",
+    options: {
+      'א': "שכיח יותר אצל חולים עם רטיניטיס פיגמנטוזה.",
+      'ב': "חשיפה לאור UV הינה גורם סיכון לגידול זה.",
+      'ג': "הגידול מופיע בשכיחות יתר בצפון אירופה.",
+      'ד': "HSV (הרפס סימפלקס) הינו גורם סיכון לגידול זה."
+    },
+    image: "73-1.png",
+    correctAnswer: "ב"
+  },
+  {
+    id: 74,
+    text: "נבדקת אומרת שהאותיות ברורות יותר על הרקע האדום במהלך בדיקה סובייקטיבית בשלב בדיקת Duochrome. כיצד יש לנהוג במצב זה?",
+    options: {
+      'א': "יש צורך להוסיף עדשת מינוס.",
+      'ב': "יש לשנות את זווית הצילינדר ב-10 מעלות עם כיוון השעון.",
+      'ג': "יש צורך להוסיף עדשת פלוס.",
+      'ד': "יש לשנות את זווית הצילינדר ב-10 מעלות נגד כיוון השעון."
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 75,
+    text: "בת 20 כבדת משקל, פונה למיון בשל כאבי עיניים וטשטוש ראיה דו צדדי. להלן מראה הדיסקות והדימות: על פי מראה הדיסקות והדימות, מהו הטיפול הנכון ביותר?",
+    options: {
+      'א': "אספירין.",
+      'ב': "דיאמוקס.",
+      'ג': "דוקסילין.",
+      'ד': "מתילפרידיזולון."
+    },
+    image: "75-1.png",
+    correctAnswer: "ד"
+  },
+  {
+    id: 76,
+    text: "במה מהבאים סביר שהמנתח ייתקל בניתוח פזילה של ילד עם תסמונת דואיין (Duane syndrome)?",
+    options: {
+      'א': "absence of the lateral rectus",
+      'ב': "Fibrotic lateral rectus",
+      'ג': "Duplication of the lateral rectus",
+      'ד': "Tight and broadly inserted lateral rectus"
+    },
+    correctAnswer: "ב"
+  },
+  {
+    id: 77,
+    text: "בן 50 מופיע עם תמונת הקרקעית הבאה. תופעה זו מגיעה בקורלציה לממצא אחר בעין. מהו?",
+    options: {
+      'א': "קטרקט.",
+      'ב': "היפראופיה.",
+      'ג': "כורואיד דק.",
+      'ד': "פגמי מילוי בקשתית."
+    },
+    image: "77-1.png",
+    correctAnswer: "א"
+  },
+  {
+    id: 78,
+    text: "איזה מהחתכים הבאים ברשתית מתאים למנח probe מכשיר ה-US שבבדיקה?",
+    options: {
+      'א': "1",
+      'ב': "3",
+      'ג': "4",
+      'ד': "2"
+    },
+    image: "78-1.png",
+    correctAnswer: "ד"
+  },
+  {
+    id: 79,
+    text: "מי מהשרירים האקסטרא-אוקולרים הבאים מעוצבב על ידי גרעין עצב מס׳ 3 הנמצא בצד הנגדי (קונטרא-לטרלי)?",
+    options: {
+      'א': "השריר הישר המדיאלי (Medial Rectus).",
+      'ב': "השריר הישר העליון (Superior Rectus).",
+      'ג': "השריר מרים-העפעף (Levator Palpebrae).",
+      'ד': "השריר האלכסוני התחתון (Inferior Oblique)."
+    },
+    correctAnswer: "ב"
+  },
+  {
+    id: 80,
+    text: "הורים מספרים כי שמו לב שאישון אחד גדול יותר מהשני בבנם בן השנתיים. בתמונות שלהלן בדיקת האישונים באור (למעלה) ובחושך (למטה): איזה ממצא לווה עשוי להופיע בהקשר לתמונה זו?",
+    options: {
+      'א': "טיפות אפראקלונידין יקצינו את האאניזוקוריה הקיימת.",
+      'ב': "היעדר deep tendon reflexes.",
+      'ג': "גוון קשתית בהיר יותר בעין עם האישון הצר יותר.",
+      'ד': "פטוזיס בעין עם האישון הרחב יותר."
+    },
+    image: "80-1.png",
+    correctAnswer: "ד"
+  },
+  {
+    id: 81,
+    text: "מהו הכוח הדיופטרי של עדשה IOL כאשר היא באוויר, בהשוואה לכוח שלה בתוך העין?",
+    options: {
+      'א': "באוויר הכוח שלה קטן בערך פי 1.5.",
+      'ב': "באוויר הכוח שלה גדול בערך פי 1.5.",
+      'ג': "באוויר הכוח שלה גדול בערך פי 3.",
+      'ד': "באוויר הכוח שלה קטן בערך פי 3."
+    },
+    correctAnswer: "ב"
+  },
+  {
+    id: 82,
+    text: "מה מהבאים נכון לומר על אפיבלפרון (Epiblepharon)?",
+    options: {
+      'א': "נפוץ פחות בילדים אסיאתיים משום שהטרזוס אצלם קצר (ולכן הפתולוגיה הנפוצה בילדים אלו היא אנטרופיון מולד).",
+      'ב': "המצב נגרם מחיבור מוחלש של ה-lower eyelid retractors לעור.",
+      'ג': "יש לתקן את מנח העפעף גם במקרים אסימפטומטים כדי להימנע מכיבים עתידיים בקרנית.",
+      'ד': "ברוב המקרים הריסים נוגעים בקרנית, חוץ מאשר ב-downgaze."
+    },
+    correctAnswer: "ב"
+  },
+  {
+    id: 83,
+    text: "מה מתארת התמונה הבאה?",
+    options: {
+      'א': "תמונה אופיינית של meibomian gland dysfunction.",
+      'ב': "תמונת Infra-red של meibomian glands תקינות.",
+      'ג': "צביעה של meibomian glands עם ליזמין גרין.",
+      'ד': "תגובה לשימוש ממושך בעדשות מגע."
+    },
+    image: "83-1.png",
+    correctAnswer: "ב"
+  },
+  {
+    id: 84,
+    text: "מה מהבאים נכון במהלך ביצוע פאקואמולסיפיקציה?",
+    options: {
+      'א': "Chatter היא תופעה לא רצויה במהלך ניתוח הניתנת למניעה על ידי הגברת ה-power.",
+      'ב': "Cavitation היא תופעה לא רצויה במהלך ניתוח הניתנת למניעה על ידי הפחתת ה-power.",
+      'ג': "Surge היא תופעה לא רצויה במהלך ניתוח הניתנת למניעה על ידי הפחתת ה-power והגדלת הואקום.",
+      'ד': "צינורות עם היענות גבוהה (high-compliance) קורסים (collapse) בקלות רבה יותר ועלולים לגרום ל-surge גדול יותר בהשוואה לצינורות עם היענות מוכה (low-compliance)."
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 85,
+    text: "ביילוד עם חשד ל-ophthalmia neonatorum לקחה דגימה מהפרשות הלחמית לצביעת גראם (gram stain). איזה ממצא יאשר את החשד שמדובר בזיהום על ידי Neisseria gonnorhoeae?",
+    options: {
+      'א': "Intracellular gram-negative diplococci",
+      'ב': "Intracellular gram-positive diplococci",
+      'ג': "Extracellular gram-positive diplococci",
+      'ד': "Extracellular gram-negative diplococci"
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 86,
+    text: "מה מהבאים נכון לגבי המבנה המסומן בחץ הכחול שבתמונה?",
+    options: {
+      'א': "המבנה ממוקם בתוך fossa בעצם הספנואיד בארובה הסופרוטמפורלית.",
+      'ב': "במידת הצורך עדיף לקחת ביופסיה מחלק B של המבנה.",
+      'ג': "הליגמנט ע״ש וויטנל (Whitnall) יוצר ספטציות דרך המבנה הזה.",
+      'ד': "העצבוב הסימפתטי למבנה זה מקורו בפונס (pons) ובהמשך מצטרף ל-lacrimal nerve."
+    },
+    image: "86-1.png",
+    correctAnswer: "א"
+  },
+  {
+    id: 87,
+    text: "המטופלת שבתמונה מתקשה לסגור את העין הימנית וסובלת מדמעת קבועה בעין זו. היא אובחנה כסובלת משיתוק עצב הפנים בצד ימין. מה מהבאים מסביר את הדמעת במקרה זה:",
+    options: {
+      'א': "חולשה של האורביקולריס גרמה לעליה בלחץ השלילי בקנליקולי בעת פתיחת עפעפיים.",
+      'ב': "חולשת האורביקולריס הפרה-ספטלי גרמה להפחתה בסחיטת שק הדמעות.",
+      'ג': "חולשת האורביקולריס הפרה-טרסלי גרמה להיצרות הקנליקולי התחתון.",
+      'ד': "היצרות של הפונקטום התחתון עקב חולשה של ה-muscle of Riolan."
+    },
+    image: "87-1.png",
+    correctAnswer: "ב"
+  },
+  {
+    id: 88,
+    text: "מה מהבאים נכון לגבי הממצאים הסיסטמיים המלווים את הממצא הרטינלי המוצג בתמונה?",
+    options: {
+      'א': "גידולים מסוג זה הממוקמים בעצב הראיה ובסביבה הפרי-פפילרית הם בדרך כלל מורמים וקל יותר לזהות אותם.",
+      'ב': "הממצא יכול להיות ספורדי, ללא כל ממצא סיסטמי אחר.",
+      'ג': "הממצא הזה קשור למחלה גנטית בעלת תורשה אוטוזומלית רצסיבית.",
+      'ד': "במקרים רבים קיים מבנה פנים טיפוסי עם חיך גבוה."
+    },
+    image: "88-1.png",
+    correctAnswer: "ב"
+  },
+  {
+    id: 89,
+    text: "מה הצירוף הנכון של צביעה - אבחנה?",
+    options: {
+      'א': "CD68 – לימפומה",
+      'ב': "Desmin – גליומה של עצב הראיה",
+      'ג': "Synaptophysin – מלנומה",
+      'ד': "S100 – שוונומה"
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 90,
+    text: "גבר בן 45 פונה בשל אירועים של כפילות וריצוד תמונה (oscillopsia), בעיקר בקריאה, מזה 4 חודשים. בבדיקתו, חדות ראיה, שדה ראיה וקרקעיות תקינות. תנועות העיניים מלאות. במה, קרוב לוודאי, מדובר?",
+    options: {
+      'א': "Skew deviation",
+      'ב': "Oculomotor nerve weakness",
+      'ג': "Superior oblique myokymia",
+      'ד': "Infantile nystagmus"
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 91,
+    text: "איזו מבדיקות ההדמיה הבאות מתאימה לבירור גרורתי ראשוני של uveal melanoma?",
+    options: {
+      'א': "קולונוסקופיה.",
+      'ב': "MRI של הבטן.",
+      'ג': "ממוגרפיה של השד.",
+      'ד': "CT של הראש."
+    },
+    correctAnswer: "ב"
+  },
+  {
+    id: 92,
+    text: "מה מהבאים נכון בנוגע לקריאה מקרוב עם משקפיים מול קריאה מקרוב עם עדשות מגע?",
+    options: {
+      'א': "ברוחק ראיה – יותר נוח לקרוא מקרוב עם משקפיים, לעומת עדשות מגע, כי קיימת השפעה פריזמטית BASE IN.",
+      'ב': "ברוחק ראיה – יותר נוח לקרוא מקרוב עם משקפיים, לעומת עדשות מגע, כי דרושה פחות אקומודציה.",
+      'ג': "בקוצר ראיה – פחות נוח לקרוא מקרוב עם משקפיים, לעומת עדשות מגע, כי קיימת השפעה פריזמטית BASE OUT.",
+      'ד': "בקוצר ראיה – יותר נוח לקרוא מקרוב עם משקפיים, לעומת עדשות מגע, כי דרושה פחות אקומודציה."
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 93,
+    text: "למיון הגיעה מטופלת בת 70 עם כאבים קשים בעין ביומיים האחרונים והתמונה הבאה. בגוניוסקופיה זווית סגורה בכל ההיקף. איזה מההיגדים הבאים נכון בנוגע למצבה הקליני?",
+    options: {
+      'א': "סביר להניח שהלחץ בבדיקה יהיה תקין.",
+      'ב': "סביר להניח שערך ה-ACD (Anterior chamber depth) יהיה נמוך.",
+      'ג': "הטיפול הדפיניטיבי הוא לייזר אירידוטומי.",
+      'ד': "נגרם מחלקי עדשה שחדרו ללשכה הקדמית."
+    },
+    image: "93-1.png",
+    correctAnswer: "ד"
+  },
+  {
+    id: 94,
+    text: "מה מהבאים נכון לגבי דיס-פוטופסיה (dysphotopsia) חיובית או שלילית לאחר ניתוח קטרקט?",
+    options: {
+      'א': "בדיספוטופסיות שליליות התלונה הנפוצה היא סהרון (crescent) כהה, אשר נמצא בדרך כלל בשדה הראיה הנאזלי.",
+      'ב': "דיספוטופסיות חיוביות נפוצות יותר בעדשות מולטיפוקליות.",
+      'ג': "הבהובים (flashes), קשתות (arcs) או הילות (halos) הן דוגמאות לדיספוטופסיות שליליות.",
+      'ד': "דיספוטופסיות שליליות בד\"כ אינן חולפות מעצמן ודורשות התערבות ניתוחית."
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 95,
+    text: "בת 30 מתלוננת על אובדן ראיה פתאומי, כאב בעין ימין ונימול בגפיים, מזה 3 ימים. חדות הראיה היא ספירת אצבעות מימין, אישון ימין אפרקטי. קרקעית תקינה דו צדדי. MRI מראה האדרה של מחצית אחורית של שני עצבי הראיה והכיאזמה, ללא ממצאים מוחיים נוספים. לאחר טיפול ב-methylprednisolone תוך ורידי, אין שיפור משמעותי בראייה. מה האבחנה הסבירה ביותר?",
+    options: {
+      'א': "neuromyelitis optica",
+      'ב': "MOG-associated disease",
+      'ג': "AZOOR",
+      'ד': "Multiple sclerosis"
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 96,
+    text: "אדם מרכיב עדשות מגע -10.00 D. מהן עדשות המשקפיים המתאימות לו, אם מרחק המסגרת מהקרניות (vertex distance) הוא 20 מ\"מ?",
+    options: {
+      'א': "-8.00D",
+      'ב': "-9.00D",
+      'ג': "-11.00D",
+      'ד': "-12.00D"
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 97,
+    text: "מה מהבאים נכון לגבי טיפול אנטי-ויראלי ב-CMV RETINITIS?",
+    options: {
+      'א': "מתן פומי של גנציקלוביר (Ganciclovir) עדיף על פני מתן תוך ורידי בזכות ספיגתו הטובה במערכת העיכול.",
+      'ב': "טיפול בוואלגנציקלוביר תוך עיני מקובל במקרים של CMV retinitis.",
+      'ג': "ואלגנציקלוביר (Valganciclovir) הוא פרודראג (prodrug) אשר נלקח דרך הפה והופך לגנציקלוביר בזכות אנזימי מעי וכבד.",
+      'ד': "פינוי גנציקלוביר מהגוף הוא ברובו דרך הכבד ולכן יש להוריד מינון התרופה במטופל עם אי ספיקת כבד."
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 98,
+    text: "מהו פרופיל הקרנית לאחר ניתוח לאסיק להיפראופיה של +5?",
+    options: {
+      'א': "Spheric",
+      'ב': "Oblate",
+      'ג': "Hyperprolate",
+      'ד': "Hyperoblate"
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 99,
+    text: "במצב של low vision, נבדק emmetrope זקוק למשקפיים לקריאה מקרוב +12.00 D בכל עין. כמה כוח פריזמטי יש להוסיף כדי לאפשר ראיה ביוקולרית נוחה?",
+    options: {
+      'א': "בכל עין להוסיף 7 פריזם-דיופטר בסיס פנימה (base in).",
+      'ב': "בכל עין להוסיף 6 פריזם-דיופטר בסיס פנימה (base in).",
+      'ג': "בכל עין להוסיף 12 פריזם-דיופטר בסיס פנימה (base in).",
+      'ד': "בכל עין להוסיף 14 פריזם-דיופטר בסיס פנימה (base in)."
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 100,
+    text: "מה מהבאים נכון בנוגע לפגיעה כלייתית (nephrotoxicity) כתוצאה מבדיקת CT עם חומר ניגוד?",
+    options: {
+      'א': "הסיכון לפגיעה כלייתית (nephrotoxicity) הוא כ-2% עד 7%.",
+      'ב': "רק במטופלים אלרגיים ליוד עלולה להיגרם פגיעה כלייתית (nephrotoxicity).",
+      'ג': "הסיכון לפגיעה כלייתית (nephrotoxicity) הוא כ-0.01% עד 0.1%.",
+      'ד': "הסיכון לפגיעה כלייתית (nephrotoxicity) הוא כ-1 למיליון."
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 101,
+    text: "איזה מהמבנים הבאים לא נוצר מה-surface ectoderm?",
+    options: {
+      'א': "Conjunctival epithelium",
+      'ב': "Corneal epithelium",
+      'ג': "Lens",
+      'ד': "Ciliary body epithelium"
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 102,
+    text: "איזו מהמחלות הבאות מופיעה בכמחצית מהמקרים לאחר מחלה ויראלית (Viral Prodrome)?",
+    options: {
+      'א': "Birdshot Chorioretinopathy",
+      'ב': "Serpiginous Choroiditis",
+      'ג': "Punctate Inner Choroiditis – PIC",
+      'ד': "Multiple Evanescent White Dot Syndrome – MEWDS"
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 103,
+    text: "בת 60, ברקע COPD, מתלוננת על כך שעין ימין שקועה. לדבריה, בזמן שיעול עין ימין בולטת החוצה לעומת עין שמאל. בהתבסס על האבחנה הסבירה ביותר, איזה מההיגדים הבאים נכון?",
+    options: {
+      'א': "ממצא שכיח במצב זה הוא conjunctival vessel engorgement.",
+      'ב': "מדובר בנגעים שהם low flow.",
+      'ג': "מצב זה בדרך כלל ילווה בלחץ תוך עיני גבוה יותר בעין ימין לעומת עין שמאל.",
+      'ד': "ממצא שכיח במצב זה הוא reflux of blood in the Schlemm canal."
+    },
+	image: "103-1.png",
+    correctAnswer: "א"
+  },
+  {
+    id: 104,
+    text: "מהי ההגדרה של אי מרכזי (central island)?",
+    options: {
+      'א': "אזור של יותר מ-3 מ\"מ של steepening בעוצמה של לפחות (at least) אחד דיופטר.",
+      'ב': "אזור של עד 3 מ\"מ של steepening בעוצמה של אחד דיופטר או פחות.",
+      'ג': "אזור של יותר מ-3 מ\"מ של steepening בעוצמה של אחד דיופטר או פחות.",
+      'ד': "אזור של עד 3 מ\"מ של steepening בעוצמה של לפחות (at least) אחד דיופטר."
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 105,
+    text: "מאיזו סיבה מהסיבות הבאות הלחץ התוך עיני עולה בשכיבה?",
+    options: {
+      'א': "עלייה ב-episcleral venous pressure.",
+      'ב': "ירידת קצב הנשימה.",
+      'ג': "עליית קצב הלב (tachycardia).",
+      'ד': "עלייה בלחץ התוך גולגולתי."
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 106,
+    text: "אילו שכבות בקרנית חיוביות בצביעת periodic acid–Schiff (PAS)?",
+    options: {
+      'א': "שכבת הבאומן וממברנת הדסצמט.",
+      'ב': "ממברנת הבסיס של האפיתל ושכבת האנדותל.",
+      'ג': "ממברנת הבסיס של האפיתל וממברנת הדסצמט.",
+      'ד': "שכבת הבאומן ושכבת האנדותל."
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 107,
+    text: "מהו הטיפול הטופיקלי המומלץ עבור קרטיטיס פונגלי על רקע Fusarium?",
+    options: {
+      'א': "נטמיצין 5%.",
+      'ב': "ווריקונזול 1%.",
+      'ג': "ווריקונזול 0.5%.",
+      'ד': "נטמיצין 0.5%."
+    },
+    correctAnswer: "ב"
+  },
+  {
+    id: 108,
+    text: "מה מהבאים נכון לגבי המצב המתואר בתמונה במטופל מספר ימים לאחר ניתוח LASIK?",
+    options: {
+      'א': "דרגות 3-4 מגיבות לטיפול סטרואידלי בטיפות ודרגות 1-2 מחייבות הרמת ה-FLAP ושטיפתו.",
+      'ב': "דרגה 3 מוגדרת כתאי דם לבנים סמיכים (dense white blood cells) במרכז ציר הראיה.",
+      'ג': "אופייני שחדות הראיה לא משתפרת גם אם בוצעה אבחנה וטיפול מוקדמים.",
+      'ד': "אופייני שתאי הדלקת נמצאים גם מעבר ל-flap edge."
+    },
+    image: "108-1.png",
+    correctAnswer: "ב"
+  },
+  {
+    id: 109,
+    text: "למטופל עם Optically Empty Vitreous נמצאה מוטציה בגן VCAN. מאיזו מחלה המטופל סובל?",
+    options: {
+      'א': "Marfan syndrome",
+      'ב': "FEVR (familial exudative vitreoretinopathy)",
+      'ג': "Stickler syndrome",
+      'ד': "Wagner syndrome"
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 110,
+    text: "במהלך ניתוח Endoscopic Dacryocystorhinostomy החל לדלוף נוזל שקוף ובתום הניתוח החולה התלונן על כאבי ראש. איזה אזור נפגע במהלך הניתוח?",
+    options: {
+      'א': "Nasal septum",
+      'ב': "Fovea ethmoidalis",
+      'ג': "Maxillary sinus",
+      'ד': "Inferomedial orbital strut"
+    },
+    correctAnswer: "ב"
+  },
+  {
+    id: 111,
+    text: "הנגע בתמונה:-",
+    options: {
+      'א': "בעל היארעות (incidence) של 1:300 לידות חי.",
+      'ב': "לרוב מופיע בעשור הראשון של החיים.",
+      'ג': "כאשר הנגע הוא חלק מסינדרום, יכולים להופיע נגעים דומים במוח.",
+      'ד': "יכול להופיע בהקשר לסינדרום Sturge Weber."
+    },
+    image: "111-1.png",
+    correctAnswer: "ד"
+  },
+  {
+    id: 112,
+    text: "בת 60, ללא מחלות רקע, שלושה ימים לאחר ניתוח בלפרופלסטי במהלך תקין. פנתה למיון בשל כאב פריאורביטלי עז, מלווה בהיעדר תחושה באזור החתך. כשעתיים לאחר קבלתה המטופלת אושפזה בטיפול מרץ לאור ירידה בערכי לחץ דם. להלן תמונה קלינית של המטופלת: מה מהבאים נכון בנוגע לאבחנה הסבירה ביותר?",
+    options: {
+      'א': "אחוזי התמותה גבוהים מ-50%.",
+      'ב': "המחולל השכיח ביותר הינו מקבוצת group B β-hemolytic streptococcus.",
+      'ג': "מרבית החולים הם immunocompetent.",
+      'ד': "הזיהום נוטה להתפשט במישורים א-ווסקולרים."
+    },
+    image: "112-1.png",
+    correctAnswer: "א"
+  },
+  {
+    id: 113,
+    text: "מהו המנגנון הגנטי שעומד בבסיס הא-וסקולריות של הקרנית?",
+    options: {
+      'א': "Polymorphism",
+      'ב': "Alternative Splicing",
+      'ג': "Methylation",
+      'ד': "Imprinting"
+    },
+    correctAnswer: "ב"
+  },
+  {
+    id: 114,
+    text: "איזה מהטיפולים הבאים לא מומלץ כטיפול להורדת לחץ בילד אסטמטי עם גלאוקומה קונגניטלית בן שנה ו-4 חודשים?",
+    options: {
+      'א': "Topical Latanoprost",
+      'ב': "Systemic Acetazolamide",
+      'ג': "Topical Dorzolamide",
+      'ד': "Topical Brimonidine"
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 115,
+    text: "בת 40, ברקע Thyroid eye disease (TED). להלן תמונה עם ממצאים קליניים מבדיקתו: מה מהבאים נכון לגבי הממצא הקליני בתמונה ב'?",
+    options: {
+      'א': "מצב זה נקרא pretibial myxedema.",
+      'ב': "מלווה בפרוגנוזה טובה למחלתו הארובתית.",
+      'ג': "מצביע על שינויים ברקמה הרכה בגפיים הפרוקסימליות (proximal extremities).",
+      'ד': "מופיע בשכיחות של 1% מהמטופלים עם TED."
+    },
+    image: "115-1.png",,
+    correctAnswer: "א"
+  },
+  {
+    id: 116,
+    text: "איזה מהמשפטים הבאים נכון לגבי Botulinum Toxin type A?",
+    options: {
+      'א': "מאושר ע״י ה-FDA לטיפול בפזילה.",
+      'ב': "אחד הסיבוכים האפשריים של טיפול קוסמטי עם התרופה הוא blepharospasm.",
+      'ג': "משתק את השריר ע״י חסימה של הרצפטור הפוסט סינפטי ל-Acetyl-choline.",
+      'ד': "מיוצר ע״י החיידק Mycobacterium Botulinum."
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 117,
+    text: "כאשר מטופל מזליף טיפה אחת לעינו - איזה אחוז מהטיפה נשאר על פני העין לכל היותר?",
+    options: {
+      'א': "80%",
+      'ב': "40%",
+      'ג': "20%",
+      'ד': "60%"
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 118,
+    text: "באיזו שכבה נמצאים גרעיני תאי ה-Müller?",
+    options: {
+      'א': "Inner plexiform layer",
+      'ב': "Inner nuclear layer",
+      'ג': "Outer nuclear layer",
+      'ד': "External limiting membrane"
+    },
+    correctAnswer: "ב"
+  },
+  {
+    id: 119,
+    text: "באיזה מהמצבים הבאים מודגמים המבנים בעיגול שבתמונה?",
+    options: {
+      'א': "Retinoblastoma",
+      'ב': "Stargardt disease",
+      'ג': "Cystoid macular edema",
+      'ד': "Retinitis pigmentosa"
+    },
+    image: "119-1.png",
+    correctAnswer: "א"
+  },
+  {
+    id: 120,
+    text: "באיזה מהמנגנונים הבאים לא צפויה עליית לחץ תוך עיני במטופל/ת עם אובאיטיס קדמית?",
+    options: {
+      'א': "שימוש בטיפות ציקלוספורין.",
+      'ב': "סגירת ה-trabecular meshwork על ידי צברי תאי דלקת.",
+      'ג': "טרבקוליטיס.",
+      'ד': "סגירת זווית במנגנון pupillary block."
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 121,
+    text: "איזה שריר מהבאים מקבל אספקת דם, בין היתר, על ידי ה-Lacrimal Artery?",
+    options: {
+      'א': "3",
+      'ב': "1",
+      'ג': "4",
+      'ד': "2"
+    },
+    image: "121-1.png",
+    correctAnswer: "ב"
+  },
+  {
+    id: 122,
+    text: "עדשת מגע רכה שמותאמת בצורה ראויה:",
+    options: {
+      'א': "תראה תנועה של כ-1 מ\"מ עם עפעוף.",
+      'ב': "תראה תנועה של כ-4 מ\"מ עם עפעוף.",
+      'ג': "תהיה ממורכזת וללא תנועה עם עפעוף.",
+      'ד': "אמורה לא לזוז כלל בתנועת העין כלפי מעלה."
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 123,
+    text: "מה מהבאים נכון לגבי Primary congenital glaucoma (PCG)?",
+    options: {
+      'א': "בדרך כלל המחלה היא חד צדדית.",
+      'ב': "מופיעה יותר בזכרים לעומת נקבות.",
+      'ג': "בדרך כלל מאובחנת לאחר השנה הראשונה לחיים.",
+      'ד': "לאדם עם PCG שאין לו סיפור משפחתי של המחלה יש סיכוי של כ-20-30% שהילד שלו גם יחלה במחלה."
+    },
+    correctAnswer: "ב"
+  },
+  {
+    id: 124,
+    text: "מה מהבאים נכון בנוגע לשכבת הדסצמט (Descemet Membrane)?",
+    options: {
+      'א': "עם הגיל, עובי שכבה זו נהיה דק יותר פי 3-4 ביחס לעובי בלידה.",
+      'ב': "היסטולוגית מורכבת משתי שכבות Anterior + Posterior banded layer כאשר לשכבה הקדמית מקובל גם לקרוא Dua layer.",
+      'ג': "מופרשת ע\"י הסטרומה האחורית של הקרנית.",
+      'ד': "השכבה האחורית של שכבת הדסמט היא ה-Non banded zone אשר מתעבה במהלך החיים."
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 125,
+    text: "בלימפומה תוך עינית מסוג primary intraocular lymphoma (PIOL), מהי ההסתמנות הקלינית הנפוצה ביותר?",
+    options: {
+      'א': "Sub-RPE infiltrates",
+      'ב': "Sub-retinal infiltrates",
+      'ג': "Pre-retinal infiltrates",
+      'ד': "Vitritis"
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 126,
+    text: "גבר בן 35 פנה למיון עם ירידה בראיה בעין שמאל מזה יום. להלן תמונת הקרקעית של עין שמאל: מהו השלב הבא בטיפול?",
+    options: {
+      'א': "ביופסיה של עורק טמפורלי.",
+      'ב': "Intra-arterial tPA",
+      'ג': "Neuroimaging בתוך 24 שעות.",
+      'ד': "הזרקות אנטי VEGF בהקדם."
+    },
+    image: "126-1.png",
+    correctAnswer: "ג"
+  },
+  {
+    id: 127,
+    text: "מאיזו מהפתולוגיות הבאות יכול לנבוע סינקינזיס (synkinesis), המתבטא בפטוזיס חד צדדי המשתנה עם תנועות הפה או העין?",
+    options: {
+      'א': "Aberrant regeneration of trigeminal nerve",
+      'ב': "Some types of Brown syndrome",
+      'ג': "Aberrant regeneration of oculomotor nerve",
+      'ד': "Marcus Gunn pupil (relative afferent pupillary different)"
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 128,
+    text: "איזו מבין האברציות האופטיות הבאות אינה מסוג HIGH ORDER?",
+    options: {
+      'א': "TREFOIL",
+      'ב': "SPHERICAL ABBERATION",
+      'ג': "COMA",
+      'ד': "PISTON"
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 129,
+    text: "הקריטריונים ל-Vogt-Koyanagi-Harada Syndrome עודכנו בפעם האחרונה ב-2001. עפ\"י הקריטריונים הללו:",
+    options: {
+      'א': "עיבוי כורואידלי ללא סקלריטיס באולטראסאונד הוא מהסימנים המאוחרים של המחלה (late manifestation).",
+      'ב': "המחלה יכולה להיות חד עינית.",
+      'ג': "לא תיתכן אבחנה של VKH אם יש עדות קלינית או מעבדתית למחלה עינית או סיסטמית אחרת.",
+      'ד': "אוביאיטיס קדמית חוזרת או כרונית היא מהסימנים המוקדמים של המחלה (early manifestation)."
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 130,
+    text: "מהי \"הטייה פנטוסקופית\" (pantoscopic tilt)?",
+    options: {
+      'א': "האפקט הפריזמטי שנוצר במשקפיים לתיקון טעות רפרקטיבית גבוהה.",
+      'ב': "תופעה של ראיית דמויות \"עקומות\" בכבדי-ראיה (low vision).",
+      'ג': "הטיית החלק התחתון של מסגרת המשקפיים לכיוון הפנים, בדרך כלל בזווית של 7 מעלות.",
+      'ד': "טעות בקביעת ציר הצילינדר המדויק במשקפיים, בעיקר בילדים."
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 131,
+    text: "בבדיקת העדפת עין בילד ללא פזילה, בשימוש בפריזמה 10PD base down, באיזו מהתוצאות הבאות מוצגת העדפה לעין ימין?",
+    options: {
+      'א': "כשהפריזמה מול עין ימין אין תזוזה של הפיקסציה, וכשהפריזמה מול עין שמאל יש תזוזה של הפיקסציה כלפי מעלה.",
+      'ב': "כשהפריזמה מול עין ימין אין תזוזה של הפיקסציה, וכשהפריזמה מול עין שמאל יש תזוזה של הפיקסציה כלפי מטה.",
+      'ג': "כשהפריזמה מול עין ימין יש תזוזה של הפיקסציה כלפי מטה, וכשהפריזמה מול עין שמאל - אין תזוזה.",
+      'ד': "כשהפריזמה מול עין ימין יש תזוזה של הפיקסציה כלפי מעלה, וכשהפריזמה מול עין שמאל - אין תזוזה."
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 132,
+    text: "לאיזו מחלה אופיינית התמונה שלהלן?",
+    options: {
+      'א': "Solar retinopathy",
+      'ב': "Central serous chorioretinopathy",
+      'ג': "Bilateral diffuse uveal melanocytic proliferation",
+      'ד': "Acute zonal occult outer retinopathy"
+    },
+    image: "132-1.png",
+    correctAnswer: "ב"
+  },
+  {
+    id: 133,
+    text: "בן 7, מתלונן על גירוי ותחושת גוף זר בשתי העיניים מזה 3 חודשים. מתייצג עם התמונה הקלינית הבאה: איזה מהבאים אינו טיפול טופיקלי מקובל למחלה הזו?",
+    options: {
+      'א': "Fresh Frozen Plasma",
+      'ב': "סטרואידים.",
+      'ג': "הפרין.",
+      'ד': "NSAIDs"
+    },
+    image: "133-1.png",
+    correctAnswer: "א"
+  },
+  {
+    id: 134,
+    text: "מטופלת בת 76 אשר הסובלת מתפקוד יתר של הפארא-תירואיד מופיעה במרפאה עם התמונה הקלינית הבאה: איזו שכבה בקרנית בעיקר מעורבת במחלה דגנרטיבית זו?",
+    options: {
+      'א': "באומן.",
+      'ב': "סטרומה קדמית.",
+      'ג': "אפיתל.",
+      'ד': "סטרומה עמוקה."
+    },
+    image: "134-1.png",
+    correctAnswer: "ד"
+  },
+  {
+    id: 135,
+    text: "למרפאה מגיעה מטופלת בת 20 עם היסטוריה של Stevens Johnson Syndrome לפני מספר שנים. כעת המחלה לא פעילה אך היא סובלת מתחושת גוף זר בשתי עיניה. להלן מוצגת בדיקתה: איזה מהמרכיבים הבאים ייכלל בניתוח לתיקון ההפרעה בעפעפיים?",
+    options: {
+      'א': "Lengthening of anterior lamella using a skin graft",
+      'ב': "Tarsal fracture operation for the upper eyelid",
+      'ג': "Horizontal tightening of upper eyelid",
+      'ד': "Fasanella-Servat tarsoconjunctival resection"
+    },
+    image: "135-1.png",
+    correctAnswer: "א"
+  },
+  {
+    id: 136,
+    text: "מהי ההסתמנות העינית הכי נפוצה במטופלים עם Reactive Arthritis?",
+    options: {
+      'א': "דלקת לחמיתית בילטרלית פפילרית עם הפרשות מוקופורולנטיות.",
+      'ב': "קרטיטיס.",
+      'ג': "אפיסקלריטיס.",
+      'ד': "אובאיטיס קדמית לא גרנולומטוטית."
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 137,
+    text: "בת 75 מתלוננת על אירועים חוזרים של אובדן ראייה חולף בעין שמאל ב-3 ימים אחרונים, וכאבים בחגורת כתפיים. הממצאים מבדיקת עיניים תקינים, למעט cotton wool spot יחיד בעין שמאל. מהו השלב הבא בניהול המטופלת?",
+    options: {
+      'א': "CT מוח וארובות.",
+      'ב': "אקו לב.",
+      'ג': "הולטר לב.",
+      'ד': "בדיקות דם: שקיעת דם, CRP וספירת דם."
+    },
+    correctAnswer: "ד"
+  },
+  {
+    id: 138,
+    text: "מהו ה-range of accommodation של נבדק בן 60, קצר-רואי (myope) -2.00 D, בעל כושר אקומודציה +3.00 D, כאשר אינו מרכיב משקפיים?",
+    options: {
+      'א': "25 ס\"מ.",
+      'ב': "30 ס\"מ.",
+      'ג': "20 ס\"מ.",
+      'ד': "15 ס\"מ."
+    },
+    correctAnswer: "א"
+  },
+  {
+    id: 139,
+    text: "מה מהבאים נכון בנוגע לעדשות EDOF (extended depth of focus) לתיקון presbyopia?",
+    options: {
+      'א': "לעדשות אלו, בניגוד לעדשות מולטיפוקליות, יש שתי focal points מוגדרות.",
+      'ב': "בעדשות אלו יש כמות נמוכה של דיספוטופסיות חיוביות כמו glare ו-halo.",
+      'ג': "עדיין אין עדשות מסוג זה המאושרות על ידי ה-FDA בארה״ב לטיפול ב-presbyopia.",
+      'ד': "אם משתילים עדשות מסוג זה בשתי העיניים לא ניתן לבצע mini-monovision."
+    },
+    correctAnswer: "ב"
+  },
+  {
+    id: 140,
+    text: "מה מהבאים נכון לגבי הבדיקה המוצגת בתמונה?",
+    options: {
+      'א': "חשובה להערכת מלנומה כורואידלית אך לא מלנומה של הגוף הסיליארי.",
+      'ב': "הבדיקה יעילה באבחון פריצת הגידול מחוץ לסקלרה.",
+      'ג': "מדובר ב-CT של העין והארובה.",
+      'ד': "זוהי סריקה מסוג K-scan, שהיא יעילה באבחנה בין נבוס למלנומה."
+    },
+    image: "140-1.png",
+    correctAnswer: "ב"
+  },
+  {
+    id: 141,
+    text: "לאיזה מהמטופלים הבאים מתאימה תבנית ה-multifocal ERG הבאה?",
+    options: {
+      'א': "מטופלת בת 85 עם geographic atrophy משני ל-AMD יבש.",
+      'ב': "מטופלת בת 65 עם Plaquenil toxicity.",
+      'ג': "מטופלת בת 30 עם מחלת Stargardt.",
+      'ד': "מטופלת בת 55 עם Retinitis Pigmentosa."
+    },
+    image: "141-1.png",
+    correctAnswer: "ב"
+  },
+  {
+    id: 142,
+    text: "במרבית המקרים, היכן מתרחשת ההידקקות ב-Pellucid Marginal Degeneration?",
+    options: {
+      'א': "בפריפריה הסופרוטמפורלית של הקרנית.",
+      'ב': "בפריפריה הסופרונזאלית של הקרנית.",
+      'ג': "בפריפריה האינפריורית של הקרנית.",
+      'ד': "באזור האפקס של הקונוס של הקרנית."
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 143,
+    text: "מה מהבאים נכון לגבי הממצא הבא במטופל לאחר ניתוח רפרקטיבי?",
+    options: {
+      'א': "במקרה של ירידה בראיה, התקדמות התאים לכיוון ציר הראיה או התפתחות אסטיגמטיזם אי-רגולרי, ההמלצה היא להתחיל טיפול בסטרואידים סיסטמי + טיפתי.",
+      'ב': "יש צורך לטפל בכל מקרה, גם במקרים של תאי אפיתל בגבול ה-FLAP או במקרים בהם התאים לא משפיעים על הראיה.",
+      'ג': "ניתן להשתמש ב-Nd:YAG laser כדי לטפל במקרים קלים\\מוקדמים.",
+      'ד': "במחקרים נמצא שההסתברות להימצאות (prevalence) הממצא היא בדרך כלל מעל 3%."
+    },
+    image: "143-1.png",
+    correctAnswer: "א"
+  },
+  {
+    id: 144,
+    text: "מה מהבאים נכון לגבי הגידול בתמונה?",
+    options: {
+      'א': "במרבית המקרים חד צדדי.",
+      'ב': "גידול שמקורו ברשתית.",
+      'ג': "במרבית המקרים מופיע בגברים.",
+      'ד': "גידול ממאיר."
+    },
+    image: "144-1.png",
+    correctAnswer: "א"
+  },
+  {
+    id: 145,
+    text: "לאיזה מהתינוקות הבאים, אשר הגיעו לבדיקת סקר בגיל שנה וחצי ואין להם פזילה, מומלץ להרכיב משקפיים?",
+    options: {
+      'א': "כל התשובות האחרות שגויות.",
+      'ב': "אסטיגמטיזם של 2.75 דיופטר בשתי העיניים.",
+      'ג': "היפרמטרופיה של 4 דיופטר בשתי העיניים.",
+      'ד': "מיופיה של 3 דיופטר בשתי העיניים."
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 146,
+    text: "הממצאים המסומנים בתמונה בחיצים שחורים הם ביטוי קליני לאיסכמיה של איזו שכבה?",
+    options: {
+      'א': "Ganglion cell layer",
+      'ב': "Retinal pigment epithelium",
+      'ג': "Muller cells",
+      'ד': "Retinal nerve fiber layer"
+    },
+    image: "146-1.png",
+    correctAnswer: "ד"
+  },
+  {
+    id: 147,
+    text: "לפניכם 4 תמונות היסטולוגיות של דיסטרופיות קרנית: באיזה מהדיסטרופיות יש צביעה חיובית של המשקעים עם צביעת Congo red?",
+    options: {
+      'א': "תמונה 3.",
+      'ב': "תמונה 2.",
+      'ג': "תמונה 1.",
+      'ד': "תמונה 4."
+    },
+    image: "147-1.png",,
+    correctAnswer: "ג"
+  },
+  {
+    id: 148,
+    text: "איזו מהתרופות הבאות לדלקת לחמיתית אלרגית פועלת במנגנון של ייצוב תאי מאסט בלבד?",
+    options: {
+      'א': "Olopatadine",
+      'ב': "Ketotifen Fumarate",
+      'ג': "Cromolyn sodium",
+      'ד': "Loteprednol etabonate"
+    },
+    correctAnswer: "ג"
+  },
+  {
+    id: 149,
+    text: "בת 49, ברקע יתר לחץ דם, מאושפזת בפנימית לאיזון היפונתרמיה. יומיים לתוך אשפוזה המטופלת מתלוננת על כאבי ראש עזים ודיפלופיה. בבדיקתה נמצא שיתוק 3 מימין ושדה הראיה הבא: מה האבחנה הסבירה?",
+    options: {
+      'א': "אנאוריזמה של ה-posterior communicating artery הימני.",
+      'ב': "אוטם פריאטלי שמאלי.",
+      'ג': "גלאוקומה.",
+      'ד': "Pituitary apoplexy."
+    },
+    image: "149-1.png",
+    correctAnswer: "ד"
+  },
+  {
+    id: 150,
+    text: "מה מהבאים הוא גורם סיכון לעין יבשה?",
+    options: {
+      'א': "מין גברי.",
+      'ב': "פגות.",
+      'ג': "מעמד סוציואקונומי נמוך.",
+      'ד': "גזע אסיאתי."
+    },
+    correctAnswer: "ד"
+  }
+
+  ];
+  
+  // Variables to track state
+    let currentQuestionIndex = 0;
+    let selectedAnswers = {};
+    let showingAnswers = false;
+    let mode = 'exam';
+    
+    // Initialize the application
+    function init() {
+      renderCurrentQuestion();
+      updateControls();
+    }
+    
+    // Render the current question
+    function renderCurrentQuestion() {
+      if (mode === 'exam') {
+        renderExamQuestion();
+      } else {
+        renderStudyMode();
+      }
+    }
+    
+    function renderExamQuestion() {
+      const question = questions[currentQuestionIndex];
+      const questionContainer = document.getElementById('question-container');
+      
+      let questionHTML = `
+        <div class="question-header">
+          <div class="question-number">שאלה ${question.id} מתוך ${questions.length}</div>
+        </div>
+        <div class="question-text">${question.text}</div>
+      `;
+      
+      if (question.image) {
+        questionHTML += `
+          <div class="image-container">
+            <img src="/06-2023/images/${question.image}" alt="תמונה לשאלה ${question.id}">
+          </div>
+        `;
+      } else if (question.multipleImages) {
+        questionHTML += `<div class="multiple-images-container">`;
+        for (let i = 0; i < question.images.length; i++) {
+          questionHTML += `
+            <div class="image-container">
+              <div class="image-label">${question.imageLabels[i]}</div>
+              <img src="/06-2023/images/${question.images[i]}" alt="תמונה ${i+1} לשאלה ${question.id}">
+            </div>
+          `;
+        }
+        questionHTML += `</div>`;
+      }
+      
+      questionHTML += '<div class="options">';
+      
+      Object.entries(question.options).forEach(([key, value]) => {
+        const isSelected = selectedAnswers[question.id] === key;
+        const isCorrect = showingAnswers && key === question.correctAnswer;
+        const isIncorrect = showingAnswers && isSelected && key !== question.correctAnswer;
+        
+        let optionClass = "option";
+        if (isSelected) optionClass += " selected";
+        if (isCorrect) optionClass += " correct";
+        if (isIncorrect) optionClass += " incorrect";
+        
+        questionHTML += `
+          <div class="${optionClass}" onclick="selectAnswer(${question.id}, '${key}')">
+            <div class="option-label">${key}</div>
+            <div class="option-text">${value}</div>
+          </div>
+        `;
+      });
+      
+      questionHTML += '</div>';
+      
+      questionContainer.innerHTML = questionHTML;
+      
+      // Update question counter
+      document.getElementById('question-counter').textContent = `${currentQuestionIndex + 1} / ${questions.length}`;
+      
+      // Show Finish button only on the last question
+      document.getElementById('finish-btn').style.display = 
+        currentQuestionIndex === questions.length - 1 ? 'inline-block' : 'none';
+    }
+    
+    function renderStudyMode() {
+      const questionContainer = document.getElementById('question-container');
+      let allQuestionsHTML = '';
+      
+      questions.forEach(question => {
+        let questionHTML = `
+          <div class="question-container">
+            <div class="question-header">
+              <div class="question-number">שאלה ${question.id}</div>
+            </div>
+            <div class="question-text">${question.text}</div>
+        `;
+        
+        if (question.image) {
+          questionHTML += `
+            <div class="image-container">
+              <img src="/06-2023/images/${question.image}" alt="תמונה לשאלה ${question.id}">
+            </div>
+          `;
+        } else if (question.multipleImages) {
+          questionHTML += `<div class="multiple-images-container">`;
+          for (let i = 0; i < question.images.length; i++) {
+            questionHTML += `
+              <div class="image-container">
+                <div class="image-label">${question.imageLabels[i]}</div>
+                <img src="/06-2023/images/${question.images[i]}" alt="תמונה ${i+1} לשאלה ${question.id}">
+              </div>
+            `;
+          }
+          questionHTML += `</div>`;
+        }
+        
+        questionHTML += '<div class="options">';
+        
+        Object.entries(question.options).forEach(([key, value]) => {
+          const isCorrect = key === question.correctAnswer;
+          
+          let optionClass = "option";
+          if (isCorrect) optionClass += " correct";
+          
+          questionHTML += `
+            <div class="${optionClass}">
+              <div class="option-label">${key}</div>
+              <div class="option-text">${value}</div>
+            </div>
+          `;
+        });
+        
+        questionHTML += '</div></div>';
+        allQuestionsHTML += questionHTML;
+      });
+      
+      questionContainer.innerHTML = allQuestionsHTML;
+      
+      // Hide navigation controls in study mode
+      document.getElementById('controls').style.display = 'none';
+    }
+    
+    // Handle selecting an answer
+    function selectAnswer(questionId, answer) {
+      if (showingAnswers) return;
+      
+      selectedAnswers[questionId] = answer;
+      renderCurrentQuestion();
+    }
+    
+    // Navigation functions
+    // Updated nextQuestion function
+function nextQuestion() {
+  if (currentQuestionIndex < questions.length - 1) {
+    currentQuestionIndex++;
+    resetShowingAnswers(); // Use the helper function
+    renderCurrentQuestion();
+    updateControls();
+  }
+}
+    
+    // Updated prevQuestion function
+function prevQuestion() {
+  if (currentQuestionIndex > 0) {
+    currentQuestionIndex--;
+    resetShowingAnswers(); // Use the helper function
+    renderCurrentQuestion();
+    updateControls();
+  }
+}
+
+	  // Create a helper function to reset showing answers state
+function resetShowingAnswers() {
+  showingAnswers = false;
+  const btn = document.getElementById('toggle-answers-btn');
+  if (btn) btn.textContent = 'הצג תשובות';
+  document.getElementById('score-display').style.display = 'none';
+}
+    // Update navigation button states
+    function updateControls() {
+      const prevBtn = document.getElementById('prev-btn');
+      const nextBtn = document.getElementById('next-btn');
+      
+      prevBtn.disabled = currentQuestionIndex === 0;
+      nextBtn.disabled = currentQuestionIndex === questions.length - 1;
+      
+      if (mode === 'study') {
+        document.getElementById('controls').style.display = 'none';
+        document.getElementById('toggle-answers-btn').style.display = 'none';
+        document.getElementById('sidebar').style.display = 'none';
+      } else {
+        document.getElementById('controls').style.display = 'flex';
+        document.getElementById('toggle-answers-btn').style.display = 'inline-block';
+        document.getElementById('sidebar').style.display = 'block';
+      }
+      
+      // Update the active question in the sidebar
+      updateSidebarNavigation();
+    }
+    
+    // Generate and update the sidebar navigation
+    // Updated generateSidebarNavigation function
+function generateSidebarNavigation() {
+  const navContainer = document.getElementById('question-nav');
+  navContainer.innerHTML = '';
+  
+  // Create buttons for all questions
+  for (let i = 0; i < questions.length; i++) {
+    const navItem = document.createElement('div');
+    navItem.className = 'nav-item';
+    navItem.textContent = i + 1;
+    navItem.addEventListener('click', function() {
+      currentQuestionIndex = i;
+      resetShowingAnswers(); // Use the helper function
+      renderCurrentQuestion();
+      updateControls();
+    });
+    
+    navContainer.appendChild(navItem);
+  }
+}
+    
+    // Update the sidebar navigation to highlight current question
+    function updateSidebarNavigation() {
+      if (mode === 'study') return;
+      
+      const navItems = document.querySelectorAll('.nav-item');
+      
+      navItems.forEach((item, index) => {
+        // Remove all special classes first
+        item.classList.remove('active', 'answered');
+        
+        // Add appropriate classes
+        if (index === currentQuestionIndex) {
+          item.classList.add('active');
+        }
+        
+        // Mark questions that have been answered
+        if (selectedAnswers[index + 1]) {
+          item.classList.add('answered');
+        }
+      });
+    }
+    
+    // Toggle showing answers
+    function toggleAnswers() {
+      showingAnswers = !showingAnswers;
+      
+      const btn = document.getElementById('toggle-answers-btn');
+      btn.textContent = showingAnswers ? 'הסתר תשובות' : 'הצג תשובות';
+      
+      if (showingAnswers) {
+        calculateAndShowScore();
+      } else {
+        document.getElementById('score-display').style.display = 'none';
+      }
+      
+      renderCurrentQuestion();
+    }
+    
+    // Calculate and display score
+    function calculateAndShowScore() {
+      let correct = 0;
+      let total = Object.keys(selectedAnswers).length;
+      
+      Object.entries(selectedAnswers).forEach(([questionId, answer]) => {
+        const question = questions.find(q => q.id === parseInt(questionId));
+        if (question && answer === question.correctAnswer) {
+          correct++;
+        }
+      });
+      
+      const scoreDisplay = document.getElementById('score-display');
+      const scoreText = document.getElementById('score-text');
+      
+      scoreText.textContent = `נכון: ${correct} מתוך ${total} (${total > 0 ? Math.round((correct / total) * 100) : 0}%)`;
+      scoreDisplay.style.display = 'block';
+      
+      return { correct, total };
+    }
+    
+    // Show results summary
+    function showResults() {
+      // Calculate the score
+      const { correct, total } = calculateResultsData();
+      const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
+      
+      // Get elements
+      const questionContainer = document.getElementById('question-container');
+      const resultsContainer = document.getElementById('results-container');
+      const resultsGrid = document.getElementById('results-grid');
+      const resultsSummary = document.getElementById('results-summary');
+      const controls = document.getElementById('controls');
+      const sidebar = document.getElementById('sidebar');
+      
+      // Hide the question and show results
+      questionContainer.style.display = 'none';
+      resultsContainer.style.display = 'block';
+      controls.style.display = 'none';
+      sidebar.style.display = 'none';
+      
+      // Create the results summary text
+      resultsSummary.innerHTML = `
+        <strong>תשובות נכונות:</strong> ${correct} מתוך ${questions.length} (${percentage}%)<br>
+        <strong>תשובות שגויות:</strong> ${total - correct}<br>
+        <strong>שאלות ללא מענה:</strong> ${questions.length - total}
+      `;
+      
+      // Clear and populate the results grid
+      resultsGrid.innerHTML = '';
+      
+      // Create a grid with all questions
+      for (let i = 0; i < questions.length; i++) {
+        const question = questions[i];
+        const selectedAnswer = selectedAnswers[question.id];
+        
+        let itemClass = 'result-item';
+        if (!selectedAnswer) {
+          itemClass += ' unanswered';
+        } else if (selectedAnswer === question.correctAnswer) {
+          itemClass += ' correct';
+        } else {
+          itemClass += ' incorrect';
+        }
+        
+        const resultItem = document.createElement('div');
+        resultItem.className = itemClass;
+        resultItem.innerHTML = `
+          <div class="result-number">${question.id}</div>
+          <div class="result-answer">${selectedAnswer || '-'}</div>
+        `;
+        
+        // Add click event to jump to that question
+        resultItem.addEventListener('click', function() {
+          returnToExam(question.id - 1);
+        });
+        
+        resultsGrid.appendChild(resultItem);
+      }
+    }
+    
+    // Calculate results data
+    function calculateResultsData() {
+      let correct = 0;
+      let total = Object.keys(selectedAnswers).length;
+      
+      Object.entries(selectedAnswers).forEach(([questionId, answer]) => {
+        const question = questions.find(q => q.id === parseInt(questionId));
+        if (question && answer === question.correctAnswer) {
+          correct++;
+        }
+      });
+      
+      return { correct, total };
+    }
+    
+    // Return to the exam
+    // Updated returnToExam function
+function returnToExam(questionIndex = null) {
+  // If a question index is provided, go to that question
+  if (questionIndex !== null) {
+    currentQuestionIndex = questionIndex;
+  }
+  
+  resetShowingAnswers(); // Use the helper function
+  
+  // Hide results and show question
+  document.getElementById('results-container').style.display = 'none';
+  document.getElementById('question-container').style.display = 'block';
+  document.getElementById('controls').style.display = 'flex';
+  
+  // Update the current question
+  renderCurrentQuestion();
+  updateControls();
+}
+    
+    // Set the mode (exam or study)
+    function setMode(newMode) {
+      mode = newMode;
+      
+      const examBtn = document.getElementById('exam-mode-btn');
+      const studyBtn = document.getElementById('study-mode-btn');
+      const toggleAnswersBtn = document.getElementById('toggle-answers-btn');
+      
+      if (mode === 'exam') {
+        examBtn.disabled = true;
+        studyBtn.disabled = false;
+        toggleAnswersBtn.style.display = 'inline-block';
+        document.getElementById('score-display').style.display = 'none';
+        document.getElementById('results-container').style.display = 'none';
+        document.getElementById('question-container').style.display = 'block';
+        showingAnswers = false;
+        toggleAnswersBtn.textContent = 'הצג תשובות';
+      } else {
+        examBtn.disabled = false;
+        studyBtn.disabled = true;
+        toggleAnswersBtn.style.display = 'none';
+        document.getElementById('score-display').style.display = 'none';
+      }
+      
+      renderCurrentQuestion();
+      updateControls();
+    }
+    
+    // Initialize the app when the page loads
+    window.onload = function() {
+      generateSidebarNavigation();
+      init();
+    };
+  </script>
+</body>
+</html>
